@@ -1,7 +1,9 @@
 
-'use client'
+// 'use client'
 
-import { useState } from 'react'
+
+
+import { ReactNode, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -27,6 +29,9 @@ import {
     XMarkIcon,
 } from '@heroicons/react/24/outline'
 import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
+import { logOut } from './service'
+import { ACCESSTOKEN_STORAGE_KEY, deleteDefaultAccessToken, USER_STORAGE_KEY } from '@/lib/ajax'
+import { RoutePath } from '@/lib/router'
 
 const navigation = [
     { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
@@ -50,13 +55,14 @@ function classNames(...classes: string[]) {
     return classes.filter(Boolean).join(' ')
 }
 
+interface Props {
+    children?: ReactNode
+    // any props that come into the component
+}
 
-export default function DashboardLayout({
-    children,
-}: Readonly<{
-    children: React.ReactNode;
-}>) {
+const DashboardLayout = ({children}:Props)=> {
     const [sidebarOpen, setSidebarOpen] = useState(false)
+    const [showLabel, setShowLabel] = useState<boolean>(true)
 
     const router = useRouter()
 
@@ -66,6 +72,14 @@ export default function DashboardLayout({
         if (route === pathName) { return }
 
         router.push(route)
+    }
+
+    const onSignOut = () => {
+        logOut()
+        localStorage.removeItem(USER_STORAGE_KEY)
+        localStorage.removeItem(ACCESSTOKEN_STORAGE_KEY)
+        deleteDefaultAccessToken()
+        router.push(RoutePath.LOGIN)
     }
 
     return (
@@ -90,7 +104,6 @@ export default function DashboardLayout({
                                     </button>
                                 </div>
                             </TransitionChild>
-                            {/* Sidebar component, swap this element with another sidebar if you like */}
                             <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4 ring-1 ring-white/10">
                                 <div className="flex h-16 shrink-0 items-center">
                                     <img
@@ -162,11 +175,9 @@ export default function DashboardLayout({
                     </div>
                 </Dialog>
 
-                {/* Static sidebar for desktop */}
-                <div className="hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex lg:w-72 lg:flex-col">
-                    {/* Sidebar component, swap this element with another sidebar if you like */}
-                    <div className="flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 px-6 pb-4">
-                        <div className="flex h-16 shrink-0 items-center">
+                <div className={`hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex ${showLabel ? 'lg:w-72' :'lg:w-fit'} lg:flex-col transform transition duration-300 ease-in-out`}>
+                    <div className={`flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 ${showLabel ? 'px-6' :''} pb-4 `}>
+                        <div className="flex h-16 shrink-0 items-center" onClick={() => {setShowLabel(showLabel ? false : true)}}>
                             <img
                                 alt="Your Company"
                                 src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
@@ -190,15 +201,20 @@ export default function DashboardLayout({
                                                         'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
                                                     )}
                                                 >
-                                                    <item.icon aria-hidden="true" className="h-6 w-6 shrink-0" />
-                                                    {item.name}
+                                                    <item.icon aria-hidden="true" className={`h-6 w-6 shrink-0 ${!showLabel ? 'm-auto' : ''} transition duration-150 ease-in-out hover:scale-150` }/>
+                                                    {showLabel ? item.name : ''}
                                                 </a>
                                             </li>
                                         ))}
                                     </ul>
                                 </li>
                                 <li>
-                                    <div className="text-xs font-semibold leading-6 text-gray-400">Your teams</div>
+                                    {showLabel ?
+                                        <div className="text-xs font-semibold leading-6 text-gray-400">Your teams</div>
+                                    : <>
+                                        <div className='bg-slate-400 h-px'></div>
+                                    </>}
+                                    
                                     <ul role="list" className="-mx-2 mt-2 space-y-1">
                                         {teams.map((team) => (
                                             <li key={team.name}>
@@ -211,10 +227,12 @@ export default function DashboardLayout({
                                                         'group flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6',
                                                     )}
                                                 >
-                                                    <span className="flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white">
+                                                    <span className={'flex h-6 w-6 shrink-0 items-center justify-center rounded-lg border border-gray-700 bg-gray-800 text-[0.625rem] font-medium text-gray-400 group-hover:text-white '
+                                                    +(!showLabel ? 'm-auto' : '')}>
                                                         {team.initial}
                                                     </span>
-                                                    <span className="truncate">{team.name}</span>
+                                                    {showLabel ? <span className="truncate">{team.name}</span> :<></>}
+                                                    
                                                 </a>
                                             </li>
                                         ))}
@@ -225,8 +243,8 @@ export default function DashboardLayout({
                                         href="#"
                                         className="group -mx-2 flex gap-x-3 rounded-md p-2 text-sm font-semibold leading-6 text-gray-400 hover:bg-gray-800 hover:text-white"
                                     >
-                                        <Cog6ToothIcon aria-hidden="true" className="h-6 w-6 shrink-0" />
-                                        Settings
+                                        <Cog6ToothIcon aria-hidden="true" className={'h-6 w-6 shrink-0 ' +(!showLabel ? 'm-auto' : '')} />
+                                        {showLabel ? 'Settings' :''}
                                     </a>
                                 </li>
                             </ul>
@@ -241,7 +259,6 @@ export default function DashboardLayout({
                             <Bars3Icon aria-hidden="true" className="h-6 w-6" />
                         </button>
 
-                        {/* Separator */}
                         <div aria-hidden="true" className="h-6 w-px bg-gray-900/10 lg:hidden" />
 
                         <div className="flex flex-1 gap-x-4 self-stretch lg:gap-x-6">
@@ -267,10 +284,8 @@ export default function DashboardLayout({
                                     <BellIcon aria-hidden="true" className="h-6 w-6" />
                                 </button>
 
-                                {/* Separator */}
                                 <div aria-hidden="true" className="hidden lg:block lg:h-6 lg:w-px lg:bg-gray-900/10" />
 
-                                {/* Profile dropdown */}
                                 <Menu as="div" className="relative">
                                     <MenuButton className="-m-1.5 flex items-center p-1.5">
                                         <span className="sr-only">Open user menu</span>
@@ -295,6 +310,11 @@ export default function DashboardLayout({
                                                 <a
                                                     //href={item.href}
                                                     className="block px-3 py-1 text-sm leading-6 text-gray-900 data-[focus]:bg-gray-50"
+                                                    onClick={() => {
+                                                        if (item.name !== 'Sign out') { return }
+
+                                                        onSignOut()
+                                                    }}
                                                 >
                                                     {item.name}
                                                 </a>
@@ -314,3 +334,50 @@ export default function DashboardLayout({
         </>
     )
 }
+
+export default DashboardLayout;
+
+// interface LayoutProps {
+//     children: ReactNode;
+//   }
+  
+//   const DashboardLayout = ({ children }: LayoutProps) => {
+//     return (
+//       <div className="dashboard-layout">
+//         {/* Sidebar or Header */}
+//         <aside className="sidebar">
+//           <nav>
+//             <ul>
+//               <li><Link href="/dashboard">Dashboard</Link></li>
+//               <li><Link href="/dashboard/project">Profile</Link></li>
+//               {/* Add more links here */}
+//             </ul>
+//           </nav>
+//         </aside>
+  
+//         {/* Main Content */}
+//         <main className="content">
+//           {children}
+//         </main>
+  
+//         <style jsx>{`
+//           .dashboard-layout {
+//             display: flex;
+//           }
+//           .sidebar {
+//             width: 250px;
+//             background-color: #2c3e50;
+//             color: white;
+//             padding: 1rem;
+//           }
+//           .content {
+//             flex-grow: 1;
+//             padding: 2rem;
+//             background-color: #ecf0f1;
+//           }
+//         `}</style>
+//       </div>
+//     );
+//   };
+  
+//   export default DashboardLayout;
