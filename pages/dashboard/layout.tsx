@@ -3,7 +3,7 @@
 
 
 
-import { ReactNode, useState } from 'react'
+import { ReactNode, useRef, useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import {
@@ -14,6 +14,7 @@ import {
     MenuButton,
     MenuItem,
     MenuItems,
+    Transition,
     TransitionChild,
 } from '@headlessui/react'
 import {
@@ -32,6 +33,7 @@ import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { logOut } from './service'
 import { ACCESSTOKEN_STORAGE_KEY, deleteDefaultAccessToken, USER_STORAGE_KEY } from '@/lib/ajax'
 import { RoutePath } from '@/lib/router'
+import clsx from 'clsx'
 
 const navigation = [
     { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
@@ -63,6 +65,7 @@ interface Props {
 const DashboardLayout = ({children}:Props)=> {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [showLabel, setShowLabel] = useState<boolean>(true)
+    const navMenuRef = useRef(null);
 
     const router = useRouter()
 
@@ -80,6 +83,22 @@ const DashboardLayout = ({children}:Props)=> {
         localStorage.removeItem(ACCESSTOKEN_STORAGE_KEY)
         deleteDefaultAccessToken()
         router.push(RoutePath.LOGIN)
+    }
+
+    const onShowLabel = () => {
+        setShowLabel(showLabel ? false : true)
+        console.log('navMenuRef',navMenuRef.current)
+
+        // if(!navMenuRef.current) { return }
+
+        // const element = navMenuRef.current as any
+        
+        // if(!showLabel) {
+        //     element.style.width ='18rem'
+        // } else {
+        //     element.style.width ='fit-content'
+        // }
+        
     }
 
     return (
@@ -175,13 +194,20 @@ const DashboardLayout = ({children}:Props)=> {
                     </div>
                 </Dialog>
 
-                <div className={`hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex ${showLabel ? 'lg:w-72' :'lg:w-fit'} lg:flex-col transform transition duration-300 ease-in-out`}>
-                    <div className={`flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 ${showLabel ? 'px-6' :''} pb-4 `}>
-                        <div className="flex h-16 shrink-0 items-center" onClick={() => {setShowLabel(showLabel ? false : true)}}>
+                <div id='nav-menu' ref={navMenuRef} 
+                className={'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex  lg:flex-col transform transition duration-400 ease-in-out '}
+                style={{
+                    width: showLabel ? '18rem' : '100px',
+                    // height: '100px',
+                    transition: 'width 0.4s',
+                  }}
+                >
+                    <div className={`flex grow flex-col gap-y-5 overflow-y-auto bg-gray-900 overflow-x-hidden ${showLabel ? 'px-6' :''} pb-4 `}>
+                        <div className="flex h-16 shrink-0 items-center" onClick={() => onShowLabel()}>
                             <img
                                 alt="Your Company"
                                 src="https://tailwindui.com/img/logos/mark.svg?color=indigo&shade=500"
-                                className="h-8 w-auto"
+                                className="h-8 w-auto m-auto"
                             />
                         </div>
                         <nav className="flex flex-1 flex-col">
@@ -251,8 +277,9 @@ const DashboardLayout = ({children}:Props)=> {
                         </nav>
                     </div>
                 </div>
+                
 
-                <div className="lg:pl-72">
+                <div className={showLabel ?'lg:pl-72' : 'lg:pl-[100px]'} style={{transition: 'padding 0.4s'}}>
                     <div className="sticky top-0 z-40 flex h-16 shrink-0 items-center gap-x-4 border-b border-gray-200 bg-white px-4 shadow-sm sm:gap-x-6 sm:px-6 lg:px-8">
                         <button type="button" onClick={() => setSidebarOpen(true)} className="-m-2.5 p-2.5 text-gray-700 lg:hidden">
                             <span className="sr-only">Open sidebar</span>

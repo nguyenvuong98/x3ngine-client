@@ -64,16 +64,16 @@ const MyApp = ({ Component, pageProps }: AppProps) => {
   const router = useRouter();
 
   useEffect(() => {
-    const accessToken = localStorage.getItem('access-token');
-    // const publicRoutes = ['/auth/signin'];
+    // const accessToken = localStorage.getItem('access-token');
+    // // const publicRoutes = ['/auth/signin'];
 
-    if (!accessToken && !publicRoutes.includes(router.pathname as RoutePath)) {
-      router.push(RoutePath.LOGIN); // Redirect to sign-in if not authenticated
-    }
+    // if (!accessToken && !publicRoutes.includes(router.pathname as RoutePath)) {
+    //   router.push(RoutePath.LOGIN); // Redirect to sign-in if not authenticated
+    // }
 
-    if (accessToken && publicRoutes.includes(router.pathname as RoutePath)) {
-      router.push(RoutePath.DASHBOARD); // Redirect to sign-in if not authenticated
-    }
+    // if (accessToken && publicRoutes.includes(router.pathname as RoutePath)) {
+    //   router.push(RoutePath.DASHBOARD); // Redirect to sign-in if not authenticated
+    // }
     console.log('router',router)
   }, [router]);
   const Layout = (Component as any).Layout || DefaultLayout;
