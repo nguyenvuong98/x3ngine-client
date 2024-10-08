@@ -1,11 +1,10 @@
 
-// 'use client'
+'use client'
 
 
 
-import { ReactNode, useRef, useState } from 'react'
+import { ReactNode, useState } from 'react'
 import { useRouter } from 'next/navigation'
-import Link from 'next/link'
 import {
     Dialog,
     DialogBackdrop,
@@ -14,7 +13,6 @@ import {
     MenuButton,
     MenuItem,
     MenuItems,
-    Transition,
     TransitionChild,
 } from '@headlessui/react'
 import {
@@ -33,7 +31,6 @@ import { ChevronDownIcon, MagnifyingGlassIcon } from '@heroicons/react/20/solid'
 import { logOut } from './service'
 import { ACCESSTOKEN_STORAGE_KEY, deleteDefaultAccessToken, USER_STORAGE_KEY } from '@/lib/ajax'
 import { RoutePath } from '@/lib/router'
-import clsx from 'clsx'
 
 const navigation = [
     { name: 'Dashboard', href: '#', icon: HomeIcon, current: true },
@@ -65,7 +62,6 @@ interface Props {
 const DashboardLayout = ({children}:Props)=> {
     const [sidebarOpen, setSidebarOpen] = useState(false)
     const [showLabel, setShowLabel] = useState<boolean>(true)
-    const navMenuRef = useRef(null);
 
     const router = useRouter()
 
@@ -87,17 +83,6 @@ const DashboardLayout = ({children}:Props)=> {
 
     const onShowLabel = () => {
         setShowLabel(showLabel ? false : true)
-        console.log('navMenuRef',navMenuRef.current)
-
-        // if(!navMenuRef.current) { return }
-
-        // const element = navMenuRef.current as any
-        
-        // if(!showLabel) {
-        //     element.style.width ='18rem'
-        // } else {
-        //     element.style.width ='fit-content'
-        // }
         
     }
 
@@ -194,7 +179,7 @@ const DashboardLayout = ({children}:Props)=> {
                     </div>
                 </Dialog>
 
-                <div id='nav-menu' ref={navMenuRef} 
+                <div id='nav-menu'
                 className={'hidden lg:fixed lg:inset-y-0 lg:z-50 lg:flex  lg:flex-col transform transition duration-400 ease-in-out '}
                 style={{
                     width: showLabel ? '18rem' : '100px',
@@ -363,48 +348,3 @@ const DashboardLayout = ({children}:Props)=> {
 }
 
 export default DashboardLayout;
-
-// interface LayoutProps {
-//     children: ReactNode;
-//   }
-  
-//   const DashboardLayout = ({ children }: LayoutProps) => {
-//     return (
-//       <div className="dashboard-layout">
-//         {/* Sidebar or Header */}
-//         <aside className="sidebar">
-//           <nav>
-//             <ul>
-//               <li><Link href="/dashboard">Dashboard</Link></li>
-//               <li><Link href="/dashboard/project">Profile</Link></li>
-//               {/* Add more links here */}
-//             </ul>
-//           </nav>
-//         </aside>
-  
-//         {/* Main Content */}
-//         <main className="content">
-//           {children}
-//         </main>
-  
-//         <style jsx>{`
-//           .dashboard-layout {
-//             display: flex;
-//           }
-//           .sidebar {
-//             width: 250px;
-//             background-color: #2c3e50;
-//             color: white;
-//             padding: 1rem;
-//           }
-//           .content {
-//             flex-grow: 1;
-//             padding: 2rem;
-//             background-color: #ecf0f1;
-//           }
-//         `}</style>
-//       </div>
-//     );
-//   };
-  
-//   export default DashboardLayout;

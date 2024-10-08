@@ -3,7 +3,7 @@ import { ACCESSTOKEN_STORAGE_KEY, setDefaultAccessToken, USER_STORAGE_KEY } from
 import { RoutePath } from '@/lib/router'
 import { useFormik } from 'formik';
 import Link from 'next/link'
-import { useRouter } from 'next/router';
+import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
 import * as Yup from 'yup';
 import Toast from '../share/component/toast';

@@ -1,8 +1,5 @@
 'use client'
 
-import { Button, Description, Dialog, DialogPanel, DialogTitle, Transition, TransitionChild } from "@headlessui/react";
-import { ArrowPathIcon } from "@heroicons/react/24/outline";
-import clsx from "clsx";
 import { useState } from "react";
 import DashboardLayout from "../layout";
 
